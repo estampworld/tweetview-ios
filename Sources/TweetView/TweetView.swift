@@ -9,16 +9,30 @@ private let HeightCallback = "heightCallback"
 private let ClickCallback = "clickCallback"
 private let HtmlTemplate = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head><body><div id='wrapper'></div></body></html>"
 
+
+@objc
+protocol TweetViewDelegate: AnyObject {
+    func tweetView(_ tweetView: TweetView, didUpdatedHeight height: CGFloat)
+    func tweetView(_ tweetView: TweetView, shouldOpenURL url: URL)
+}
+
 public class TweetView: UIView {
     
     // The WKWebView we'll use to display the Tweet
     private var webView: WKWebView!
     
-    // The Tweet ID
+    /// The TweetView Delegate
+    @IBInspectable weak var delegate: TweetViewDelegate?
+    
+    /// The Tweet ID
     @IBInspectable var id: String
     
-    // The height of the TweetView
-    private(set) var height: CGFloat
+    /// The height of the TweetView
+    private(set) var height: CGFloat {
+        didSet {
+            delegate?.tweetView(self, didUpdatedHeight: height)
+        }
+    }
     
     init(id: String) {
         self.id = id
@@ -78,10 +92,11 @@ public class TweetView: UIView {
     }
 }
 
-
+// MARK: - WKNavigationDelegate
 extension TweetView: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let url = navigationAction.request.url, navigationAction.navigationType == .linkActivated {
+            delegate?.tweetView(self, shouldOpenURL: url)
             decisionHandler(.cancel)
         } else {
             decisionHandler(.allow)
@@ -115,25 +130,27 @@ extension TweetView: WKNavigationDelegate {
     }
 }
 
-
+// MARK: - WKUIDelegate
 extension TweetView: WKUIDelegate {
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         // Allow links with target="_blank" to open in SafariViewController
         //   (includes clicks on the background of Embedded Tweets
         if let url = navigationAction.request.url, navigationAction.targetFrame == nil {
+            delegate?.tweetView(self, shouldOpenURL: url)
         }
         
         return nil
     }
 }
 
+// MARK: - WKScriptMessageHandler
 extension TweetView: WKScriptMessageHandler {
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         switch message.name {
         case HeightCallback:
             guard let message = message.body as? String, let intHeight = Int(message) else { return }
-            self.height = CGFloat(intHeight) + 20.0
+            self.height = CGFloat(intHeight) + TweetPadding
         default:
             print("Unhandled callback")
         }
