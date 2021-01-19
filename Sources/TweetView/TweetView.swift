@@ -1,3 +1,7 @@
-struct TweetView {
-    var text = "Hello, World!"
+#if canImport(UIKit)
+import UIKit
+
+public class TweetView: UIView {
 }
+
+#endif
