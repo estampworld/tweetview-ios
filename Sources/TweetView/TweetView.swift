@@ -4,7 +4,8 @@ import WebKit
 import SafariServices
 
 private let DefaultCellHeight: CGFloat = 20
-private let TweetPadding: CGFloat = 20
+private let TweetPadding: CGFloat = 30
+
 private let HeightCallback = "heightCallback"
 private let ClickCallback = "clickCallback"
 private let HtmlTemplate = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head><body><div id='wrapper'></div></body></html>"
@@ -34,6 +35,8 @@ public class TweetView: UIView {
         }
     }
     
+    /// Initializes and returns a newly allocated tweet view object with the specified id
+    /// - Parameter id: Tweet's id
     init(id: String) {
         self.id = id
         self.height = DefaultCellHeight
@@ -54,7 +57,7 @@ public class TweetView: UIView {
     
     required init?(coder: NSCoder) {
         
-        self.id = "736726372966502400"
+        self.id = ""
         self.height = DefaultCellHeight
                 
         super.init(coder: coder)
@@ -62,7 +65,6 @@ public class TweetView: UIView {
         webView = self.createWebView()
         addSubview(webView)
 
-        
         webView.translatesAutoresizingMaskIntoConstraints = false
         
         webView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
@@ -90,6 +92,14 @@ public class TweetView: UIView {
         
         return webView
     }
+    
+    // MARK: Methods
+    
+    /// Load the Tweet's HTML template
+    public func load() {
+        webView.loadHTMLString(HtmlTemplate, baseURL: nil)
+    }
+    
 }
 
 // MARK: - WKNavigationDelegate
@@ -109,10 +119,9 @@ extension TweetView: WKNavigationDelegate {
     
     // Tweet Loader
     func loadTweetInWebView(_ webView: WKWebView) {
-        if let widgetsJsScript = WidgetsJsManager.shared.getScriptContent() {
+        if let widgetsJSScript = WidgetsJsManager.shared.getScriptContent() {
             
-            print(webView.frame)
-            webView.evaluateJavaScript(widgetsJsScript)
+            webView.evaluateJavaScript(widgetsJSScript)
             webView.evaluateJavaScript("twttr.widgets.load();")
             
             // Documentation:
@@ -145,7 +154,6 @@ extension TweetView: WKUIDelegate {
 
 // MARK: - WKScriptMessageHandler
 extension TweetView: WKScriptMessageHandler {
-    
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         switch message.name {
         case HeightCallback:
@@ -155,7 +163,6 @@ extension TweetView: WKScriptMessageHandler {
             print("Unhandled callback")
         }
     }
-    
 }
 
 #endif
