@@ -47,6 +47,9 @@ public class TweetView: UIView {
     @IBInspectable public  var id: String
     
     /// The height of the TweetView
+    public private(set) var state: State = .idle
+    
+    /// The height of the TweetView
     public private(set) var height: CGFloat {
         didSet {
             delegate?.tweetView(self, didUpdatedHeight: height)
@@ -74,6 +77,15 @@ public class TweetView: UIView {
         addWebViewToSubviews()
     }
     
+    // MARK: Methods
+    
+    /// Load the Tweet's HTML template
+    public func load() {
+        guard state != .loading else { return }
+        state = .loading
+        webView.loadHTMLString(HtmlTemplate, baseURL: nil)
+    }
+    
     fileprivate func addWebViewToSubviews() {
         addSubview(webView)
         
@@ -85,32 +97,8 @@ public class TweetView: UIView {
         webView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
     }
     
-    // MARK: Methods
-    
-    /// Load the Tweet's HTML template
-    public func load() {
-        webView.loadHTMLString(HtmlTemplate, baseURL: nil)
-    }
-    
-}
-
-// MARK: - WKNavigationDelegate
-extension TweetView: WKNavigationDelegate {
-    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let url = navigationAction.request.url, navigationAction.navigationType == .linkActivated {
-            delegate?.tweetView(self, shouldOpenURL: url)
-            decisionHandler(.cancel)
-        } else {
-            decisionHandler(.allow)
-        }
-    }
-    
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        loadTweetInWebView(webView)
-    }
-    
     // Tweet Loader
-    func loadTweetInWebView(_ webView: WKWebView) {
+    private func loadTweetInWebView(_ webView: WKWebView) {
         if let widgetsJSScript = WidgetsJsManager.shared.getScriptContent() {
             
             webView.evaluateJavaScript(widgetsJSScript)
@@ -128,6 +116,27 @@ extension TweetView: WKNavigationDelegate {
                 });
             """)
         }
+    }
+}
+
+// MARK: - WKNavigationDelegate
+extension TweetView: WKNavigationDelegate {
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if let url = navigationAction.request.url, navigationAction.navigationType == .linkActivated {
+            delegate?.tweetView(self, shouldOpenURL: url)
+            decisionHandler(.cancel)
+        } else {
+            decisionHandler(.allow)
+        }
+    }
+    
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        loadTweetInWebView(webView)
+        state = .loaded
+    }
+    
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        state = .failed
     }
 }
 
@@ -154,6 +163,12 @@ extension TweetView: WKScriptMessageHandler {
         default:
             print("Unhandled callback")
         }
+    }
+}
+
+extension TweetView {
+    public enum State {
+        case idle, loading, loaded, failed
     }
 }
 
