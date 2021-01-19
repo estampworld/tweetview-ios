@@ -12,7 +12,7 @@ private let HtmlTemplate = "<html><head><meta name='viewport' content='width=dev
 
 
 @objc
-protocol TweetViewDelegate: AnyObject {
+public protocol TweetViewDelegate: AnyObject {
     func tweetView(_ tweetView: TweetView, didUpdatedHeight height: CGFloat)
     func tweetView(_ tweetView: TweetView, shouldOpenURL url: URL)
 }
@@ -41,13 +41,13 @@ public class TweetView: UIView {
     }()
     
     /// The TweetView Delegate
-    @IBInspectable weak var delegate: TweetViewDelegate?
+    @IBInspectable public weak var delegate: TweetViewDelegate?
     
     /// The Tweet ID
-    @IBInspectable var id: String
+    @IBInspectable public  var id: String
     
     /// The height of the TweetView
-    private(set) var height: CGFloat {
+    public private(set) var height: CGFloat {
         didSet {
             delegate?.tweetView(self, didUpdatedHeight: height)
         }

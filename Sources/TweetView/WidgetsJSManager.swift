@@ -8,12 +8,12 @@
 import Foundation
 
 public class WidgetsJsManager {
-    static let shared = WidgetsJsManager()
+    public static let shared = WidgetsJsManager()
     
     // The contents of https://platform.twitter.com/widgets.js
     var content: String?
     
-    func load() {
+    public func load() {
         let task = URLSession.shared.dataTask(with: URL(string: "https://platform.twitter.com/widgets.js")!) { (data, response, error) in
             guard let data = data else {
                 return
@@ -23,7 +23,7 @@ public class WidgetsJsManager {
         task.resume()
     }
     
-    func getScriptContent() -> String? {
+    public func getScriptContent() -> String? {
         return content
     }
 }
