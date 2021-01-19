@@ -7,7 +7,7 @@ final class TweetViewTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
         
-        XCTAssertNotNil(TweetView(frame: CGRect.zero))
+        XCTAssertNotNil(TweetView(id: "736726372966502400"))
     }
 
     static var allTests = [

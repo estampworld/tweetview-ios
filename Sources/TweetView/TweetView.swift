@@ -94,13 +94,30 @@ extension TweetView: WKNavigationDelegate {
     
     // Tweet Loader
     func loadTweetInWebView(_ webView: WKWebView) {
-        
+        if let widgetsJsScript = WidgetsJsManager.shared.getScriptContent() {
+            
+            print(webView.frame)
+            webView.evaluateJavaScript(widgetsJsScript)
+            webView.evaluateJavaScript("twttr.widgets.load();")
+            
+            // Documentation:
+            // https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-javascript-factory-function
+            webView.evaluateJavaScript("""
+                twttr.widgets.createTweet(
+                    '\(id)',
+                    document.getElementById('wrapper'),
+                    { align: 'center', theme: 'dark' }
+                ).then(el => {
+                    window.webkit.messageHandlers.heightCallback.postMessage(el.offsetHeight.toString())
+                });
+            """)
+        }
     }
 }
 
 
 extension TweetView: WKUIDelegate {
-    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         // Allow links with target="_blank" to open in SafariViewController
         //   (includes clicks on the background of Embedded Tweets
         if let url = navigationAction.request.url, navigationAction.targetFrame == nil {
@@ -112,7 +129,7 @@ extension TweetView: WKUIDelegate {
 
 extension TweetView: WKScriptMessageHandler {
     
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         switch message.name {
         case HeightCallback:
             guard let message = message.body as? String, let intHeight = Int(message) else { return }
