@@ -17,7 +17,7 @@ final class TweetViewTests: XCTestCase {
         let tweetView = TweetView(id: "736726372966502400")
         XCTAssertEqual(tweetView.id, "736726372966502400")
     }
-
+    
     static var allTests = [
         ("testExample", testExample),
     ]

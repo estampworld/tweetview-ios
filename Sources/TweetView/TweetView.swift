@@ -20,7 +20,25 @@ protocol TweetViewDelegate: AnyObject {
 public class TweetView: UIView {
     
     // The WKWebView we'll use to display the Tweet
-    private var webView: WKWebView!
+    private lazy var webView: WKWebView! = {
+        let webView = WKWebView()
+        
+        // Set delegates
+        webView.navigationDelegate = self
+        webView.uiDelegate = self
+        
+        // Register callbacks
+        webView.configuration.userContentController.add(self, name: ClickCallback)
+        webView.configuration.userContentController.add(self, name: HeightCallback)
+        
+        // Set initial frame
+        webView.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: CGFloat(DefaultCellHeight))
+        
+        // Prevent scrolling
+        webView.scrollView.isScrollEnabled = false
+        
+        return webView
+    }()
     
     /// The TweetView Delegate
     @IBInspectable weak var delegate: TweetViewDelegate?
@@ -42,17 +60,8 @@ public class TweetView: UIView {
         self.height = DefaultCellHeight
         
         super.init(frame: CGRect.zero)
-        
-        webView = self.createWebView()
-        
-        addSubview(webView)
-        
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        
-        webView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
-        webView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-        webView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-        webView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+                
+        addWebViewToSubviews()
     }
     
     required init?(coder: NSCoder) {
@@ -62,35 +71,18 @@ public class TweetView: UIView {
                 
         super.init(coder: coder)
 
-        webView = self.createWebView()
+        addWebViewToSubviews()
+    }
+    
+    fileprivate func addWebViewToSubviews() {
         addSubview(webView)
-
+        
         webView.translatesAutoresizingMaskIntoConstraints = false
         
         webView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         webView.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         webView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
         webView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-    }
-    
-    private func createWebView() -> WKWebView {
-        let webView = WKWebView()
-        
-        // Set delegates
-        webView.navigationDelegate = self
-        webView.uiDelegate = self
-        
-        // Register callbacks
-        webView.configuration.userContentController.add(self, name: ClickCallback)
-        webView.configuration.userContentController.add(self, name: HeightCallback)
-        
-        // Set initial frame
-        webView.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: CGFloat(DefaultCellHeight))
-        
-        // Prevent scrolling
-        webView.scrollView.isScrollEnabled = false
-        
-        return webView
     }
     
     // MARK: Methods
