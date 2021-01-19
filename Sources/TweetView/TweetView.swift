@@ -23,6 +23,8 @@ public class TweetView: UIView {
     private lazy var webView: WKWebView! = {
         let webView = WKWebView()
         
+        webView.isOpaque = false
+        
         // Set delegates
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -104,13 +106,18 @@ public class TweetView: UIView {
             webView.evaluateJavaScript(widgetsJSScript)
             webView.evaluateJavaScript("twttr.widgets.load();")
             
+            var theme = "light"
+            if #available(iOS 13.0, *), UITraitCollection.current.userInterfaceStyle == .dark {
+                theme = "dark"
+            }
+            
             // Documentation:
             // https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-javascript-factory-function
             webView.evaluateJavaScript("""
                 twttr.widgets.createTweet(
                     '\(id)',
                     document.getElementById('wrapper'),
-                    { align: 'center', theme: 'dark' }
+                    { align: 'center', theme: '\(theme)' }
                 ).then(el => {
                     window.webkit.messageHandlers.heightCallback.postMessage(el.offsetHeight.toString())
                 });
