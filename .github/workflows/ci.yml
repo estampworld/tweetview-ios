@@ -1,0 +1,26 @@
+name: "TweetView CI"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    env: 
+      DEVELOPER_DIR: /Applications/Xcode_12.3.0.app/Contents/Developer
+    
+    strategy:
+      matrix:
+        destination: ["platform=iOS Simulator,name=iPhone 12 Pro"]
+        
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: swift build -v
+    - name: Run tests
+      run: xcodebuild -scheme "TweetView" test -sdk iphonesimulator -destination "${{ matrix.destination }}"
