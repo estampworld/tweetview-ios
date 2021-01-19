@@ -55,7 +55,7 @@ public class TweetView: UIView {
     
     /// Initializes and returns a newly allocated tweet view object with the specified id
     /// - Parameter id: Tweet's id
-    init(id: String) {
+    public init(id: String) {
         self.id = id
         self.height = DefaultCellHeight
         
@@ -64,7 +64,7 @@ public class TweetView: UIView {
         addWebViewToSubviews()
     }
     
-    required init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         
         self.id = ""
         self.height = DefaultCellHeight
