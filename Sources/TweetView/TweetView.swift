@@ -65,8 +65,6 @@ public class TweetView: UIView {
         self.height = DefaultCellHeight
         
         super.init(frame: CGRect.zero)
-                
-        addWebViewToSubviews()
     }
     
     public required init?(coder: NSCoder) {
@@ -75,8 +73,6 @@ public class TweetView: UIView {
         self.height = DefaultCellHeight
                 
         super.init(coder: coder)
-
-        addWebViewToSubviews()
     }
     
     // MARK: Methods
@@ -85,6 +81,8 @@ public class TweetView: UIView {
     public func load() {
         guard state != .loading else { return }
         state = .loading
+        addWebViewToSubviews()
+
         webView.loadHTMLString(HtmlTemplate, baseURL: nil)
     }
     
@@ -110,7 +108,11 @@ public class TweetView: UIView {
             if #available(iOS 13.0, *), UITraitCollection.current.userInterfaceStyle == .dark {
                 theme = "dark"
             }
-            
+
+            print("LOADING \(self.frame.width)")
+
+            print("LOADING WK \(webView.frame.width)")
+
             // Documentation:
             // https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-javascript-factory-function
             webView.evaluateJavaScript("""
