@@ -1,19 +1,20 @@
 //
-//  File.swift
-//  
+//  WidgetsJSManager.swift
+//
 //
 //  Created by Eduardo Irias on 1/19/21.
 //
 
 import Foundation
 
-public class WidgetsJsManager {
-    public static let shared = WidgetsJsManager()
+internal class WidgetsJSManager {
+    static let shared = WidgetsJSManager()
     
     // The contents of https://platform.twitter.com/widgets.js
-    var content: String?
+    private(set) var content: String?
     
     public func load() {
+        guard content == nil else { return }
         let task = URLSession.shared.dataTask(with: URL(string: "https://platform.twitter.com/widgets.js")!) { (data, response, error) in
             guard let data = data else {
                 return
@@ -22,8 +23,5 @@ public class WidgetsJsManager {
         }
         task.resume()
     }
-    
-    public func getScriptContent() -> String? {
-        return content
-    }
 }
+

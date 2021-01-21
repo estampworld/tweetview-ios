@@ -10,7 +10,6 @@ private let HeightCallback = "heightCallback"
 private let ClickCallback = "clickCallback"
 private let HtmlTemplate = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head><body><div id='wrapper'></div></body></html>"
 
-
 @objc
 public protocol TweetViewDelegate: AnyObject {
     func tweetView(_ tweetView: TweetView, didUpdatedHeight height: CGFloat)
@@ -18,6 +17,10 @@ public protocol TweetViewDelegate: AnyObject {
 }
 
 public class TweetView: UIView {
+    
+    public static func prepare() {
+        WidgetsJSManager.shared.load()
+    }
     
     // The WKWebView we'll use to display the Tweet
     private lazy var webView: WKWebView! = {
@@ -99,7 +102,7 @@ public class TweetView: UIView {
     
     // Tweet Loader
     private func loadTweetInWebView(_ webView: WKWebView) {
-        if let widgetsJSScript = WidgetsJsManager.shared.getScriptContent() {
+        if let widgetsJSScript = WidgetsJSManager.shared.content {
             
             webView.evaluateJavaScript(widgetsJSScript)
             webView.evaluateJavaScript("twttr.widgets.load();")
@@ -108,11 +111,7 @@ public class TweetView: UIView {
             if #available(iOS 13.0, *), UITraitCollection.current.userInterfaceStyle == .dark {
                 theme = "dark"
             }
-
-            print("LOADING \(self.frame.width)")
-
-            print("LOADING WK \(webView.frame.width)")
-
+            
             // Documentation:
             // https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-javascript-factory-function
             webView.evaluateJavaScript("""
