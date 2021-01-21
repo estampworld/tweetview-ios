@@ -23,12 +23,20 @@ A description of this package.
 #### Creating a Tweet View
 
 ```
-let width = min( view.frame.width - 32, 300)
+
+TweetView.prepare()
+
+let width = view.frame.width - 32.0
+
+let tweetView = TweetView(id:"1345021162959503360")
+
 tweetView.frame = CGRect(x: 16, y: 16, width: width, height: width)
 tweetView.delegate = self
-tweetView.load()
 
 self.view.addSubview(tweetView)
+
+tweetView.load()
+
 ```
 
 #### Delegate
@@ -36,6 +44,7 @@ self.view.addSubview(tweetView)
 ```
 extension ...: TweetViewDelegate {
     func tweetView(_ tweetView: TweetView, didUpdatedHeight height: CGFloat) {
+        tweetView.frame.size = CGSize(width: tweetView.frame.width, height: height)
     }
     
     func tweetView(_ tweetView: TweetView, shouldOpenURL url: URL) {
