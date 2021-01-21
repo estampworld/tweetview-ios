@@ -4,11 +4,11 @@ import WebKit
 import SafariServices
 
 private let DefaultCellHeight: CGFloat = 20
-private let TweetPadding: CGFloat = 30
+private let TweetPadding: CGFloat = 40
 
 private let HeightCallback = "heightCallback"
 private let ClickCallback = "clickCallback"
-private let HtmlTemplate = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head><body><div id='wrapper'></div></body></html>"
+private let HtmlTemplate = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><style>* { margin: 0; padding: 0; } </style></head><body><div id='wrapper'></div></body></html>"
 
 @objc
 public protocol TweetViewDelegate: AnyObject {
