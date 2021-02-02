@@ -1,8 +1,9 @@
 # TweetView
 
 ![TweetView CI](https://github.com/estampworld/tweetview-ios/workflows/TweetView%20CI/badge.svg)
+[![codebeat badge](https://codebeat.co/badges/bd881f0e-80eb-4973-99bf-f86165ccfde6)](https://codebeat.co/projects/github-com-estampworld-tweetview-ios-main)
 
-A description of this package.
+Display a Tweet in a TweetView using the Tweet's id.
 
 ## Features
 
