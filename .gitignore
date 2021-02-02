@@ -1,5 +1,18 @@
+# OS X
 .DS_Store
-/.build
-/Packages
+
+# Xcode
+
+## Build generated
+build/
+DerivedData
+
+## Various settings
+xcuserdata
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
 /*.xcodeproj
-xcuserdata/
+/Packages
