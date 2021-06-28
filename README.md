@@ -53,6 +53,56 @@ extension ...: TweetViewDelegate {
 }
 ```
 
+#### SwiftUI
+
+```
+struct SwiftUITweetView: View {
+    @State var id: String
+    @State var height: CGFloat = 200
+    
+    var body: some View {
+        TweetViewAdapter(id: $id, height: $height)
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: height, maxHeight: .infinity)
+    }
+}
+
+struct TweetViewAdapter: UIViewRepresentable {
+    @Binding var id: String
+    @Binding var height: CGFloat
+    
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(height: $height)
+    }
+    
+    func makeUIView(context: Context) -> TweetView {
+        TweetView.prepare()
+        let tweetView = TweetView(id: id)
+        tweetView.delegate = context.coordinator
+        tweetView.load()
+        return tweetView
+    }
+    
+    func updateUIView(_ uiView: TweetView, context: Context) {
+    }
+}
+
+class Coordinator: NSObject, TweetViewDelegate {
+    @Binding var updatedHeight: CGFloat
+    
+    init(height: Binding<CGFloat>, showWebView: Binding<Bool>, urlToShow: Binding<URL?>) {
+        _updatedHeight = height
+    }
+    
+    func tweetView(_ tweetView: TweetView, didUpdatedHeight height: CGFloat) {
+        tweetView.frame.size = CGSize(width: tweetView.frame.width, height: height)
+        updatedHeight = height
+    }
+    
+    func tweetView(_ tweetView: TweetView, shouldOpenURL url: URL) {
+    }
+}
+```
+
 ### Based on
 
 https://blog.twitter.com/developer/en_us/topics/tips/2019/displaying-tweets-in-ios-apps.html
